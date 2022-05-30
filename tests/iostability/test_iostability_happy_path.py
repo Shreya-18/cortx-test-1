@@ -227,7 +227,8 @@ class TestIOWorkload:
                       " deletes. Delete all the written data once %s is reached",
                       write_percent_per_iter, delete_percent_per_iter, max_cluster_capacity_percent)
         workload_info_list = []
-        end_time = datetime.now() + timedelta(days=self.duration_in_days)
+        end_time = datetime.now() + timedelta(minutes=self.duration_in_days)
+        self.log.info("Start time: %s. end time: %s", datetime.now(), end_time)
         write_per = 0
         loop = 1
         while datetime.now() < end_time:

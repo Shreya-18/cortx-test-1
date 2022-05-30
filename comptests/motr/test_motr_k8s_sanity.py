@@ -295,6 +295,7 @@ class TestExecuteK8Sanity:
 
     @pytest.mark.tags("TEST-37336")
     @pytest.mark.motr_sanity
+    # @pytest.mark.hare_sanity
     def test_sns_repair_rebalance_with_failure_less_than_k(self):
         """
         This is to test if SNS repair/rebalance start and status hctl interfaces works

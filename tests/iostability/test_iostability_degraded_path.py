@@ -208,6 +208,7 @@ class TestIOWorkloadDegradedPath:
         self.log.info("Step 4: Performing read operations.")
         end_time = datetime.now() + timedelta(days=self.duration_in_days)
         loop = 1
+        self.log.info("Start time: %s. end time: %s", datetime.now(), end_time)
         while datetime.now() < end_time:
             loop += 1
             self.log.info("%s remaining time for reading loop", (end_time - datetime.now()))
@@ -229,6 +230,7 @@ class TestIOWorkloadDegradedPath:
     # pylint: disable-msg=too-many-locals
     @pytest.mark.lc
     @pytest.mark.io_stability
+    @pytest.mark.hare_sanity
     @pytest.mark.tags("TEST-40174")
     def test_degraded_iteration_write_read_partial_delete(self):
         """Perform 30% Writes of user data capacity (Healthy mode) and perform Object CRUD
@@ -246,7 +248,6 @@ class TestIOWorkloadDegradedPath:
 
         max_percentage = self.test_cfg['nearfull_storage_percentage']
         clients = (len(self.worker_node_list) - 1) * self.clients
-        end_time = datetime.now() + timedelta(days=self.duration_in_days)
 
         bucket_creation_healthy_mode = self.test_cfg['bucket_creation_healthy_mode']
         avail_buckets = []
@@ -286,7 +287,9 @@ class TestIOWorkloadDegradedPath:
 
         self.log.info("Step 4: Perform Reads/Delete on data written in healthy mode"
                       " and Write/Reads/Delete on data written in degraded mode")
+        end_time = datetime.now() + timedelta(minutes=self.duration_in_days)
         loop = 1
+        self.log.info("Start time: %s. end time: %s", datetime.now(), end_time)
         while datetime.now() < end_time:
             self.log.info(" Loop count : %s", loop)
             loop += 1
