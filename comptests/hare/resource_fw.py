@@ -19,6 +19,7 @@ class Statistics:
         self.api = client.CustomObjectsApi()
         self.hax_stats = []
         self.max_cpu_list = []
+        self.max_mem_list = []
 
     def collect_readings(self, service):
         curr_stats = []
@@ -31,6 +32,11 @@ class Statistics:
                 if field['name'] == service:
                     # print(stats["timestamp"])
                     # print(f'{stats["metadata"]["name"]} {field["usage"]}')
+                    # StatRecord(
+                    #   timestamp='2022-08-01T09:32:54Z',
+                    #   name='cortx-server-4',
+                    #   cpu='146193235n',
+                    #   mem='235336Ki')
                     curr_stats.append(
                         StatRecord(stats["timestamp"],
                                    stats["metadata"]["name"],
@@ -43,8 +49,10 @@ class Statistics:
 
     def aggregate_records(self, curr_stats):
         if curr_stats:
-            max_cpu = max([int(stat.cpu[:-1]) for stat in curr_stats])
+            max_cpu = max((int(stat.cpu[:-1]) for stat in curr_stats))
             self.max_cpu_list.append(max_cpu)
+            max_mem = max((int(stat.mem[:-2]) for stat in curr_stats))
+            self.max_mem_list.append(max_mem)
             return True
         else:
             print('Service is not present')
@@ -62,10 +70,11 @@ class Statistics:
             with open(f'{file}.txt', 'a') as f:
                 f.write(
                     json.dumps({
-
                         "timestamp": current_time,
                         "res": self.max_cpu_list,
-                        "avg_max": sum(self.max_cpu_list) / len(self.max_cpu_list)}))
+                        "avg_max_cpu": sum(self.max_cpu_list) / len(self.max_cpu_list),
+                        "avg_max_mem": sum(self.max_mem_list) / len(self.max_mem_list)
+                    }))
 
 
 class MetricsServer:
@@ -357,6 +366,9 @@ def deployment_stage(stat, service, time):
     while process_running(process):
         stat.collect_readings(service)
         sleep(time)
+
+    # post deployment immediate readings
+    default_run(stat, service, time, 5)
 
 
 def default_run(stat, service, time, iterations=10):
